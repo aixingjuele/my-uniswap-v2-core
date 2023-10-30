@@ -51,11 +51,65 @@ contract PowerMarket is PowerModel{
     string[] public arrBuyOrderId;
 
     // 卖单信息
-    // mapping (string=>Order) public sellOrderInfo;
-    // mapping (address=>string) public sellOrderId;
+    mapping (address=>mapping(string=>Order)) public sellOrderInfo;
+    mapping (string=>Order) public allSellOrderId;
+    string[] public arrSellOrderId;
 
 
 
+
+
+
+    //###########sellOrderInfo start#######################################################
+    function addSellOrderInfo(Order memory o) public {
+
+        o.initialized = true;
+        o.timestamp = block.timestamp;
+        sellOrderInfo[msg.sender][o.orderId]=o;
+        allSellOrderId[o.orderId]=o;
+        arrSellOrderId.push(o.orderId);
+    }
+
+
+
+
+    function getSellOrderInfo(string memory  _orderId) public view returns (Order memory o) {
+        o = allSellOrderId[_orderId];
+        return o;
+    }
+
+
+
+
+    function deleteSellOrderData(address _address,string memory _orderId) public {
+        require(msg.sender == _address, "You can only delete your own data");
+
+
+        if (isSellOrderInfoEmpty(_address,_orderId)){
+            delete sellOrderInfo[_address][_orderId];
+            delete allSellOrderId[_orderId];
+            removeArrSellOrderId(_orderId);
+        }
+    }
+
+
+    function isSellOrderInfoEmpty(address _address,string memory _orderId) public view returns (bool) {
+        return sellOrderInfo[_address][_orderId].initialized;
+    }
+
+    function removeArrSellOrderId(string memory _orderId) internal{
+        uint length =  arrBuyOrderId.length;
+        for (uint i = 0; i < length; i++) {
+            if (bytes(arrBuyOrderId[i]).length != 0 && isElementInArray(_orderId)) {
+                arrBuyOrderId[i] = "";
+            }
+        }
+    }
+
+
+    //###########sellOrderInfo end########################################################
+
+    //###########buyOrderInfo start#######################################################
     function addBuyOrderInfo(Order memory o) public {
 
         o.initialized = true;
@@ -74,22 +128,39 @@ contract PowerMarket is PowerModel{
     }
 
 
-    function isStructEmpty(address _address,string memory _orderId) public view returns (bool) {
-        return !buyOrderInfo[_address][_orderId].initialized;
+    function isBuyOrderInfoEmpty(address _address,string memory _orderId) public view returns (bool) {
+        return buyOrderInfo[_address][_orderId].initialized;
     }
 
-    function deleteData(address _address,string memory _orderId) public {
+    function deleteBuyOrderData(address _address,string memory _orderId) public {
         require(msg.sender == _address, "You can only delete your own data");
 
-        // mapping(string=>Order) addressMappOrder = buyOrderInfo[_address];
 
-        if (isStructEmpty(_address,_orderId)){
+        if (isBuyOrderInfoEmpty(_address,_orderId)){
             delete buyOrderInfo[_address][_orderId];
             delete allBuyOrderInfo[_orderId];
+            removeArrBuyOrderId(_orderId);
         }
-
-
     }
 
+    function removeArrBuyOrderId(string memory _orderId) internal{
+        uint length =  arrBuyOrderId.length;
+        for (uint i = 0; i < length; i++) {
+            if (bytes(arrBuyOrderId[i]).length != 0 && isElementInArray(_orderId)) {
+                arrBuyOrderId[i] = "";
+            }
+        }
+    }
 
+    function isElementInArray(string memory element) public view returns (bool) {
+        bytes32 elementHash = keccak256(abi.encodePacked(element));
+        for (uint i = 0; i < arrBuyOrderId.length; i++) {
+            if (keccak256(abi.encodePacked(arrBuyOrderId[i])) == elementHash) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //###########buyOrderInfo end#######################################################
 }
