@@ -3,7 +3,22 @@ pragma solidity ^0.8.4;
 
 
 abstract contract PowerModel{
+
+    // 限价单  市价单
     enum OrderType { Buy, Sell }
+
+    // 限价单  市价单
+    enum LimitType {Limit, Market }
+    /*已提交 (Submitted): 订单已被交易者提交到交易所，等待撮合。
+      部分成交 (Partial Fill): 订单被部分成交，其中一部分订单数量已经完成，但仍有剩余未成交的部分。
+      全部成交 (Filled): 订单的所有数量已被成功成交。
+      已取消 (Canceled): 交易者主动取消了订单，订单将不再参与撮合。
+      过期 (Expired): 订单在其有效期内未被成交，而且已经过了有效期。
+      错误 (Pending): 订单可能会因错误或异常情况而无法正常处理。
+*/
+    enum OrderStatus {Submitted,PartialFill,Filled,Canceled,Expired,Pending}
+
+
 
     struct Order {
 
@@ -37,12 +52,22 @@ abstract contract PowerModel{
 
         bool initialized;
 
+        OrderStatus orderStatus;
+
+        OrderType orderType;
+
     }
 }
 
 
 
 contract PowerMarket is PowerModel{
+
+    event AddSellOrderInfo(Order o);
+    event AddBuyOrderInfo(Order o);
+
+    event DeleteSellOrderData(Order o);
+    event DeleteBuyOrderData(Order o);
 
 
     // 买单信息
@@ -58,14 +83,17 @@ contract PowerMarket is PowerModel{
 
 
     function checkOrderParameter(Order memory o)public view  {
-        require(bytes(o.orderId).length==0,"orderId can not empty");
-        require(o.quantity > 0,"quantity needs to be greater than 0");
-        require(o.price > 0,"price needs to be greater than 0");
+        require(bytes(o.orderId).length!=0,"OrderId can not empty");
+        require(o.quantity > 0,"Quantity must be greater than 0");
+        require(o.price > 0,"Price must be greater than 0");
 
         require(getBlockTimestamp() < o.expirationTime, "Timelock::expirationTime: has to more than blocktime.");
 
-        require(bytes(o.subjectInformation).length==0,"subjectInformation can not empty");
-        require(bytes(o.deliveryInformation).length==0,"deliveryInformation can not empty");
+        require(bytes(o.subjectInformation).length!=0,"SubjectInformation can not empty");
+        require(bytes(o.deliveryInformation).length!=0,"DeliveryInformation can not empty");
+
+        require((o.orderType==OrderType.Limit||o.orderType==OrderType.Market),"Order type is limit or market");
+
     }
 
 
@@ -77,9 +105,13 @@ contract PowerMarket is PowerModel{
         o.initialized = true;
         o.timestamp = block.timestamp;
         o.user = msg.sender;
+        o.orderStatus = OrderStatus.Submitted;
+
         sellOrderInfo[msg.sender][o.orderId]=o;
         allSellOrderId[o.orderId]=o;
         arrSellOrderId.push(o.orderId);
+
+        emit AddSellOrderInfo(o);
     }
 
 
@@ -93,14 +125,16 @@ contract PowerMarket is PowerModel{
 
 
 
-    function deleteSellOrderData(address _address,string memory _orderId) public {
+    function  cancelSellOrder(address _address,string memory _orderId) public {
         require(msg.sender == _address, "You can only delete your own data");
 
 
         if (isSellOrderInfoEmpty(_address,_orderId)){
+            Order memory o = allSellOrderId[_orderId];
             delete sellOrderInfo[_address][_orderId];
             delete allSellOrderId[_orderId];
             removeArrSellOrderId(_orderId);
+            emit DeleteSellOrderData(o);
         }
     }
 
@@ -130,10 +164,13 @@ contract PowerMarket is PowerModel{
         o.initialized = true;
         o.timestamp = block.timestamp;
         o.user = msg.sender;
+        o.orderStatus = OrderStatus.Submitted;
 
         buyOrderInfo[msg.sender][o.orderId]=o;
         allBuyOrderInfo[o.orderId]=o;
         arrBuyOrderId.push(o.orderId);
+
+        emit AddBuyOrderInfo(o);
     }
 
 
@@ -149,14 +186,18 @@ contract PowerMarket is PowerModel{
         return buyOrderInfo[_address][_orderId].initialized;
     }
 
-    function deleteBuyOrderData(address _address,string memory _orderId) public {
+    function cancelBuyOrder(address _address,string memory _orderId) public {
         require(msg.sender == _address, "You can only delete your own data");
 
 
         if (isBuyOrderInfoEmpty(_address,_orderId)){
+
+            Order memory o = allBuyOrderInfo[_orderId];
             delete buyOrderInfo[_address][_orderId];
             delete allBuyOrderInfo[_orderId];
             removeArrBuyOrderId(_orderId);
+
+            emit DeleteBuyOrderData(o);
         }
     }
 
