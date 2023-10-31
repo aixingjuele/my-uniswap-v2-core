@@ -57,14 +57,26 @@ contract PowerMarket is PowerModel{
 
 
 
+    function checkOrderParameter(Order memory o)public view  {
+        require(bytes(o.orderId).length==0,"orderId can not empty");
+        require(o.quantity > 0,"quantity needs to be greater than 0");
+        require(o.price > 0,"price needs to be greater than 0");
 
+        require(getBlockTimestamp() < o.expirationTime, "Timelock::expirationTime: has to more than blocktime.");
+
+        require(bytes(o.subjectInformation).length==0,"subjectInformation can not empty");
+        require(bytes(o.deliveryInformation).length==0,"deliveryInformation can not empty");
+    }
 
 
     //###########sellOrderInfo start#######################################################
     function addSellOrderInfo(Order memory o) public {
 
+        checkOrderParameter(o);
+
         o.initialized = true;
         o.timestamp = block.timestamp;
+        o.user = msg.sender;
         sellOrderInfo[msg.sender][o.orderId]=o;
         allSellOrderId[o.orderId]=o;
         arrSellOrderId.push(o.orderId);
@@ -112,8 +124,13 @@ contract PowerMarket is PowerModel{
     //###########buyOrderInfo start#######################################################
     function addBuyOrderInfo(Order memory o) public {
 
+        checkOrderParameter(o);
+
+
         o.initialized = true;
         o.timestamp = block.timestamp;
+        o.user = msg.sender;
+
         buyOrderInfo[msg.sender][o.orderId]=o;
         allBuyOrderInfo[o.orderId]=o;
         arrBuyOrderId.push(o.orderId);
@@ -163,4 +180,8 @@ contract PowerMarket is PowerModel{
     }
 
     //###########buyOrderInfo end#######################################################
+
+    function getBlockTimestamp() public view returns (uint) {
+        return block.timestamp;
+    }
 }
