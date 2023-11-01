@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 
 abstract contract PowerModel{
 
-    // 限价单  市价单
     enum OrderType { Buy, Sell }
 
     // 限价单  市价单
@@ -54,7 +53,7 @@ abstract contract PowerModel{
 
         OrderStatus orderStatus;
 
-        OrderType orderType;
+        LimitType limitType;
 
     }
 }
@@ -68,6 +67,10 @@ contract PowerMarket is PowerModel{
 
     event DeleteSellOrderData(Order o);
     event DeleteBuyOrderData(Order o);
+
+
+    event ExpireSellOrderData(Order o);
+    event ExpireBuyOrderData(Order o);
 
 
     // 买单信息
@@ -92,7 +95,7 @@ contract PowerMarket is PowerModel{
         require(bytes(o.subjectInformation).length!=0,"SubjectInformation can not empty");
         require(bytes(o.deliveryInformation).length!=0,"DeliveryInformation can not empty");
 
-        require((o.orderType==OrderType.Limit||o.orderType==OrderType.Market),"Order type is limit or market");
+        require((o.limitType==LimitType.Limit||o.limitType==LimitType.Market),"Order type is limit or market");
 
     }
 
@@ -106,6 +109,7 @@ contract PowerMarket is PowerModel{
         o.timestamp = block.timestamp;
         o.user = msg.sender;
         o.orderStatus = OrderStatus.Submitted;
+        // o.orderType = OrderType.Sell;
 
         sellOrderInfo[msg.sender][o.orderId]=o;
         allSellOrderId[o.orderId]=o;
@@ -139,6 +143,18 @@ contract PowerMarket is PowerModel{
     }
 
 
+
+    function expireSellOrder(address _address,string memory _orderId) internal {
+        if (isSellOrderInfoEmpty(_address,_orderId)){
+
+            allSellOrderId[_orderId].orderStatus = OrderStatus.Expired;
+            Order memory o = allSellOrderId[_orderId];
+            sellOrderInfo[_address][_orderId].orderStatus = OrderStatus.Expired;
+            emit ExpireSellOrderData(o);
+        }
+    }
+
+
     function isSellOrderInfoEmpty(address _address,string memory _orderId) public view returns (bool) {
         return sellOrderInfo[_address][_orderId].initialized;
     }
@@ -165,6 +181,8 @@ contract PowerMarket is PowerModel{
         o.timestamp = block.timestamp;
         o.user = msg.sender;
         o.orderStatus = OrderStatus.Submitted;
+        // o.orderType = OrderType.Buy;
+
 
         buyOrderInfo[msg.sender][o.orderId]=o;
         allBuyOrderInfo[o.orderId]=o;
@@ -198,6 +216,17 @@ contract PowerMarket is PowerModel{
             removeArrBuyOrderId(_orderId);
 
             emit DeleteBuyOrderData(o);
+        }
+    }
+
+
+    function expireBuyOrder(address _address,string memory _orderId) internal {
+        if (isBuyOrderInfoEmpty(_address,_orderId)){
+
+            allBuyOrderInfo[_orderId].orderStatus = OrderStatus.Expired;
+            Order memory o = allBuyOrderInfo[_orderId];
+            buyOrderInfo[_address][_orderId].orderStatus = OrderStatus.Expired;
+            emit ExpireBuyOrderData(o);
         }
     }
 

@@ -15,18 +15,25 @@ contract PowerTradeMatch is PowerMarket{
         address  seller
     );
 
-    function checkOrderStatus(Order memory o)private  returns (bool)    {
+    function checkOrderStatus(Order memory o,OrderType orderType)private  returns (bool) {
 
         //匹配限价单
-        if(o.orderType!=LimitType.Limit){
+        if(o.limitType!=LimitType.Limit){
             return false;
         }
+
         //匹配已提交和部分提交
         if(!(o.orderStatus==OrderStatus.Submitted||o.orderStatus==OrderStatus.PartialFill)){
             return false;
         }
         //判断交易是否过期
         if (getBlockTimestamp() >= o.expirationTime) {
+            if(OrderType.Buy==orderType){
+                expireBuyOrder(o.user,o.orderId);
+            }else{
+                expireSellOrder(o.user,o.orderId);
+            }
+
             return false;
         }
         return  true;
@@ -37,7 +44,7 @@ contract PowerTradeMatch is PowerMarket{
         for (uint256 i = 0; i < arrBuyOrderId.length; i++) {
             string memory buyOrderId = arrBuyOrderId[i];
             Order storage buyOrder = allBuyOrderInfo[buyOrderId];
-            bool buyOrderFlag = checkOrderStatus(buyOrder);
+            bool buyOrderFlag = checkOrderStatus(buyOrder,OrderType.Buy);
             if(!buyOrderFlag){
                 continue;
             }
@@ -47,7 +54,7 @@ contract PowerTradeMatch is PowerMarket{
                 string memory sellOrderId = arrSellOrderId[j];
                 Order storage sellOrder = allSellOrderId[sellOrderId];
 
-                bool sellOrderFlag = checkOrderStatus(sellOrder);
+                bool sellOrderFlag = checkOrderStatus(sellOrder,OrderType.Sell);
                 if(!sellOrderFlag){
                     continue ;
                 }
@@ -62,6 +69,16 @@ contract PowerTradeMatch is PowerMarket{
                     sellOrder.quantity -= tradeQuantity;
                     buyOrder.remainingQuantity -= tradeQuantity;
 
+
+                    if (sellOrder.quantity == 0) {
+                        sellOrder.orderStatus = OrderStatus.Filled;
+                    }
+
+                    if (buyOrder.remainingQuantity == 0) {
+                        buyOrder.orderStatus = OrderStatus.Filled;
+                        break;
+                    }
+
                     emit TradeExecuted(
                         buyOrderId,
                         sellOrderId,
@@ -70,16 +87,12 @@ contract PowerTradeMatch is PowerMarket{
                         buyOrder.user,
                         sellOrder.user
                     );
-
-                    if (sellOrder.quantity == 0) {
-                        // sellOrder. = true;
-                    }
-
-                    if (buyOrder.remainingQuantity == 0) {
-                        // buyOrder.isCancelled = true;
-                        break;
-                    }
                 }
+            }
+
+            if (buyOrder.quantity != buyOrder.remainingQuantity && buyOrder.remainingQuantity > 0) {
+                buyOrder.orderStatus = OrderStatus.PartialFill;
+                break;
             }
         }
     }
