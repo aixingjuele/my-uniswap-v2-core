@@ -66,11 +66,11 @@ contract PowerTradeMatch is PowerMarket{
                     }
 
                     // Execute the trade
-                    sellOrder.quantity -= tradeQuantity;
+                    sellOrder.remainingQuantity -= tradeQuantity;
                     buyOrder.remainingQuantity -= tradeQuantity;
 
 
-                    if (sellOrder.quantity == 0) {
+                    if (sellOrder.remainingQuantity == 0) {
                         sellOrder.orderStatus = OrderStatus.Filled;
                     }
 
