@@ -4,6 +4,9 @@ pragma solidity ^0.8.4;
 
 abstract contract PowerModel{
 
+    event TestEvent(string indexed str);
+
+
     enum OrderType { Buy, Sell }
 
     // 限价单  市价单
@@ -56,11 +59,22 @@ abstract contract PowerModel{
         LimitType limitType;
 
     }
+
 }
 
 
 
-contract PowerMarket is PowerModel{
+abstract contract PowerMarket is PowerModel{
+
+
+    uint256 private BLOCK_NUM;
+
+    constructor(){
+        BLOCK_NUM = getBlockNumber();
+
+    }
+
+
 
     event AddSellOrderInfo(Order o);
     event AddBuyOrderInfo(Order o);
@@ -82,6 +96,13 @@ contract PowerMarket is PowerModel{
     mapping (address=>mapping(string=>Order)) public sellOrderInfo;
     mapping (string=>Order) public allSellOrderId;
     string[] public arrSellOrderId;
+
+
+    function isStringNotEmpty(string memory _str) public pure returns (bool) {
+        bytes memory str = bytes(_str);
+        return str.length>0;
+    }
+
 
 
 
@@ -116,6 +137,7 @@ contract PowerMarket is PowerModel{
         arrSellOrderId.push(o.orderId);
 
         emit AddSellOrderInfo(o);
+        execProwerTradeMath();
     }
 
 
@@ -189,6 +211,7 @@ contract PowerMarket is PowerModel{
         arrBuyOrderId.push(o.orderId);
 
         emit AddBuyOrderInfo(o);
+        execProwerTradeMath();
     }
 
 
@@ -254,4 +277,24 @@ contract PowerMarket is PowerModel{
     function getBlockTimestamp() public view returns (uint) {
         return block.timestamp;
     }
+
+    function getBlockNumber() public view returns (uint256) {
+        return block.number;
+    }
+
+
+
+    function matchLimitOrders()virtual public;
+    function matchMarketOrders()virtual public;
+    //新增区块时触发撮合
+    function execProwerTradeMath() public{
+        if(BLOCK_NUM<getBlockNumber()){
+            matchLimitOrders();
+            matchMarketOrders();
+        }
+        BLOCK_NUM = getBlockNumber();
+    }
+
+
+
 }
