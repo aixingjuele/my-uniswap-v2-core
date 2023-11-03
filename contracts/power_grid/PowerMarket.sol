@@ -137,7 +137,7 @@ abstract contract PowerMarket is PowerModel{
         arrSellOrderId.push(o.orderId);
 
         emit AddSellOrderInfo(o);
-        execProwerTradeMath();
+        execProwerTradeMatch();
     }
 
 
@@ -211,7 +211,7 @@ abstract contract PowerMarket is PowerModel{
         arrBuyOrderId.push(o.orderId);
 
         emit AddBuyOrderInfo(o);
-        execProwerTradeMath();
+        execProwerTradeMatch();
     }
 
 
@@ -287,7 +287,7 @@ abstract contract PowerMarket is PowerModel{
     function matchLimitOrders()virtual public;
     function matchMarketOrders()virtual public;
     //新增区块时触发撮合
-    function execProwerTradeMath() public{
+    function execProwerTradeMatch() private{
         if(BLOCK_NUM<getBlockNumber()){
             matchLimitOrders();
             matchMarketOrders();
