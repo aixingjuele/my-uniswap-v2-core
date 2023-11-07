@@ -76,10 +76,6 @@ contract PowerTradeMatch is PowerMarket{
                         sellOrder.orderStatus = OrderStatus.Filled;
                     }
 
-                    if (buyOrder.remainingQuantity == 0) {
-                        buyOrder.orderStatus = OrderStatus.Filled;
-                        break;
-                    }
 
                     emit TradeExecuted(
                         buyOrderId,
@@ -89,12 +85,16 @@ contract PowerTradeMatch is PowerMarket{
                         buyOrder.user,
                         sellOrder.user
                     );
+
+                    if (buyOrder.remainingQuantity == 0) {
+                        buyOrder.orderStatus = OrderStatus.Filled;
+                        break;
+                    }
                 }
             }
 
             if (buyOrder.quantity != buyOrder.remainingQuantity && buyOrder.remainingQuantity > 0) {
                 buyOrder.orderStatus = OrderStatus.PartialFill;
-                break;
             }
         }
     }
@@ -191,10 +191,6 @@ contract PowerTradeMatch is PowerMarket{
                     sellOrder.orderStatus = OrderStatus.Filled;
                 }
 
-                if (buyOrder.remainingQuantity == 0) {
-                    buyOrder.orderStatus = OrderStatus.Filled;
-                    break; // 买单已全部成交，跳出卖单循环
-                }
 
                 emit TradeExecuted(
                     buyOrderId,
@@ -204,6 +200,11 @@ contract PowerTradeMatch is PowerMarket{
                     buyOrder.user,
                     sellOrder.user
                 );
+
+                if (buyOrder.remainingQuantity == 0) {
+                    buyOrder.orderStatus = OrderStatus.Filled;
+                    break; // 买单已全部成交，跳出卖单循环
+                }
             }
 
         } while (existsSellOrder);
@@ -244,10 +245,6 @@ contract PowerTradeMatch is PowerMarket{
                     sellOrder.orderStatus = OrderStatus.Filled;
                 }
 
-                if (buyOrder.remainingQuantity == 0) {
-                    buyOrder.orderStatus = OrderStatus.Filled;
-                    break; // 买单已全部成交，跳出卖单循环
-                }
 
                 emit TradeExecuted(
                     buyOrderId,
@@ -257,6 +254,14 @@ contract PowerTradeMatch is PowerMarket{
                     buyOrder.user,
                     sellOrder.user
                 );
+
+
+                if (buyOrder.remainingQuantity == 0) {
+                    buyOrder.orderStatus = OrderStatus.Filled;
+                    break; // 买单已全部成交，跳出卖单循环
+                }
+
+
             }
 
         } while (existsBuyOrder);

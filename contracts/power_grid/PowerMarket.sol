@@ -21,7 +21,6 @@ abstract contract PowerModel{
     enum OrderStatus {Submitted,PartialFill,Filled,Canceled,Expired,Pending}
 
 
-
     struct Order {
 
         //提交订单时间戳
