@@ -1,0 +1,133 @@
+  event TradeExecuted(
+        string indexed buyOrderId,
+        string indexed sellOrderId,
+        uint256 quantity,
+        uint256 price,
+        address indexed buyer,
+        address  seller
+    );   这是我在EVM上定义的一个事件，帮我给出用go语言读出事件的代码，合约地址为：0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B
+
+
+
+package main
+
+import (
+	"fmt"
+	"log"
+	"strings"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rpc"
+)
+
+func main() {
+	// 以太坊节点的RPC URL
+	ethereumURL := "YOUR_ETHEREUM_RPC_URL_HERE"
+	// 合约地址
+	contractAddress := common.HexToAddress("0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B")
+
+	// 创建以太坊节点的RPC客户端
+	client, err := rpc.Dial(ethereumURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to the Ethereum client: %v", err)
+	}
+
+	// 解析合约 ABI
+	contractABI, err := abi.JSON(strings.NewReader(contractABIJSON))
+	if err != nil {
+		log.Fatalf("Failed to parse contract ABI: %v", err)
+	}
+
+	// 过滤事件参数
+	buyOrderID := "YOUR_BUY_ORDER_ID"
+	sellOrderID := "YOUR_SELL_ORDER_ID"
+
+	query := ethereum.FilterQuery{
+		Addresses: []common.Address{contractAddress},
+		Topics: [][]common.Hash{
+			{
+				// 在此处添加 buyOrderID 的 Keccak256 哈希值
+				common.HexToHash("0xYOUR_BUY_ORDER_ID_KECCAK256_HASH"),
+				// 在此处添加 sellOrderID 的 Keccak256 哈希值
+				common.HexToHash("0xYOUR_SELL_ORDER_ID_KECCAK256_HASH"),
+			},
+		},
+	}
+
+	logs, err := client.FilterLogs(context.Background(), query)
+	if err != nil {
+		log.Fatalf("Failed to filter logs: %v", err)
+	}
+
+	for _, log := range logs {
+		var event struct {
+			BuyOrderID string
+			SellOrderID string
+			Quantity *big.Int
+			Price *big.Int
+			Buyer common.Address
+			Seller common.Address
+		}
+
+		err := contractABI.Unpack(&event, "TradeExecuted", log.Data)
+		if err != nil {
+			log.Fatalf("Failed to unpack event data: %v", err)
+		}
+
+		fmt.Printf("Buy Order ID: %s\n", event.BuyOrderID)
+		fmt.Printf("Sell Order ID: %s\n", event.SellOrderID)
+		fmt.Printf("Quantity: %s\n", event.Quantity.String())
+		fmt.Printf("Price: %s\n", event.Price.String())
+		fmt.Printf("Buyer: %s\n", event.Buyer.Hex())
+		fmt.Printf("Seller: %s\n", event.Seller.Hex())
+	}
+}
+
+// 请将以下 JSON ABI 替换为您的合约的 ABI
+var contractABIJSON = `
+[
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "string",
+                "name": "buyOrderId",
+                "type": "string"
+            },
+            {
+                "indexed": true,
+                "internalType": "string",
+                "name": "sellOrderId",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "quantity",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "price",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "buyer",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "seller",
+                "type": "address"
+            }
+        ],
+        "name": "TradeExecuted",
+        "type": "event"
+    }
+]
+`

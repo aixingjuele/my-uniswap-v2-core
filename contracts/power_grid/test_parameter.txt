@@ -8,19 +8,14 @@ https://cloud.tencent.com/developer/article/2207615
 
         //提交订单时间戳
         uint256 timestamp;
-
         //订单信息
         string orderId;
-
-
         address user;
-
         //数量
         uint256 quantity;
 
         //剩余数量
         uint256  remainingQuantity;
-
 
         //价格
         uint256 price;
@@ -40,10 +35,8 @@ https://cloud.tencent.com/developer/article/2207615
 
         LimitType limitType;
 */
-
- 
 #addSellOrderInfo
-[0,"SellOrder_001","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",5,5,10088,1701391904,"test售电主题信息5","test售电交付信息5",true,0,0]
+[0,"SellOrder_001","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",6,6,10000,1701391904,"test售电主题信息5","test售电交付信息5",true,0,0]
 [0,"SellOrder_002","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",50,50,10088,1701391904,"test售电主题信息50","test售电交付信息50",true,0,0]
 [0,"SellOrder_003","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",500,500,10088,1701391904,"test售电主题信息500","test售电交付信息500",true,0,0]
 [0,"SellOrder_004","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",5000,5000,10088,1701391904,"test售电主题信息5000","test售电交付信息5000",true,0,0]
@@ -104,6 +97,19 @@ https://cloud.tencent.com/developer/article/2207615
 错误 (Error): 订单可能会因错误或异常情况而无法正常处理。
 
   
-
+{
+    "timestamp": "0",
+    "orderId": "SellOrder_001",
+    "user": "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",
+    "quantity": "5",
+    "remainingQuantity": "5",
+    "price": "10088",
+    "expirationTime": "1701391904",
+    "subjectInformation": "test售电主题信息5",
+    "deliveryInformation": "test售电交付信息5",
+    "initialized": true,
+    "orderStatus": 0,
+    "limitType": 0
+}
 
 

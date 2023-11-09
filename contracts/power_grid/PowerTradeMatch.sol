@@ -74,6 +74,8 @@ contract PowerTradeMatch is PowerMarket{
 
                     if (sellOrder.remainingQuantity == 0) {
                         sellOrder.orderStatus = OrderStatus.Filled;
+                    }else{
+                        sellOrder.orderStatus = OrderStatus.PartialFill;
                     }
 
 
@@ -189,6 +191,8 @@ contract PowerTradeMatch is PowerMarket{
 
                 if (sellOrder.remainingQuantity == 0) {
                     sellOrder.orderStatus = OrderStatus.Filled;
+                }else {
+                    sellOrder.orderStatus = OrderStatus.PartialFill;
                 }
 
 
@@ -243,6 +247,8 @@ contract PowerTradeMatch is PowerMarket{
 
                 if (sellOrder.remainingQuantity == 0) {
                     sellOrder.orderStatus = OrderStatus.Filled;
+                }else{
+                    sellOrder.orderStatus = OrderStatus.PartialFill;
                 }
 
 

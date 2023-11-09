@@ -129,7 +129,7 @@ abstract contract PowerMarket is PowerModel{
         o.timestamp = block.timestamp;
         o.user = msg.sender;
         o.orderStatus = OrderStatus.Submitted;
-        // o.orderType = OrderType.Sell;
+        o.remainingQuantity = o.quantity;
 
         sellOrderInfo[msg.sender][o.orderId]=o;
         allSellOrderId[o.orderId]=o;
@@ -202,7 +202,7 @@ abstract contract PowerMarket is PowerModel{
         o.timestamp = block.timestamp;
         o.user = msg.sender;
         o.orderStatus = OrderStatus.Submitted;
-        // o.orderType = OrderType.Buy;
+        o.remainingQuantity = o.quantity;
 
 
         buyOrderInfo[msg.sender][o.orderId]=o;
