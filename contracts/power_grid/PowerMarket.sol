@@ -93,7 +93,7 @@ abstract contract PowerMarket is PowerModel{
 
     // 卖单信息
     mapping (address=>mapping(string=>Order)) public sellOrderInfo;
-    mapping (string=>Order) public allSellOrderId;
+    mapping (string=>Order) public allSellOrderInfo;
     string[] public arrSellOrderId;
 
 
@@ -132,7 +132,7 @@ abstract contract PowerMarket is PowerModel{
         o.remainingQuantity = o.quantity;
 
         sellOrderInfo[msg.sender][o.orderId]=o;
-        allSellOrderId[o.orderId]=o;
+        allSellOrderInfo[o.orderId]=o;
         arrSellOrderId.push(o.orderId);
 
         emit AddSellOrderInfo(o);
@@ -143,7 +143,7 @@ abstract contract PowerMarket is PowerModel{
 
 
     function getSellOrderInfo(string memory  _orderId) public view returns (Order memory o) {
-        o = allSellOrderId[_orderId];
+        o = allSellOrderInfo[_orderId];
         return o;
     }
 
@@ -155,9 +155,9 @@ abstract contract PowerMarket is PowerModel{
 
 
         if (isSellOrderInfoEmpty(_address,_orderId)){
-            Order memory o = allSellOrderId[_orderId];
+            Order memory o = allSellOrderInfo[_orderId];
             delete sellOrderInfo[_address][_orderId];
-            delete allSellOrderId[_orderId];
+            delete allSellOrderInfo[_orderId];
             removeArrSellOrderId(_orderId);
             emit DeleteSellOrderData(o);
         }
@@ -168,8 +168,8 @@ abstract contract PowerMarket is PowerModel{
     function expireSellOrder(address _address,string memory _orderId) internal {
         if (isSellOrderInfoEmpty(_address,_orderId)){
 
-            allSellOrderId[_orderId].orderStatus = OrderStatus.Expired;
-            Order memory o = allSellOrderId[_orderId];
+            allSellOrderInfo[_orderId].orderStatus = OrderStatus.Expired;
+            Order memory o = allSellOrderInfo[_orderId];
             sellOrderInfo[_address][_orderId].orderStatus = OrderStatus.Expired;
             emit ExpireSellOrderData(o);
         }

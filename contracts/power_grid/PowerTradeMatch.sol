@@ -54,7 +54,7 @@ contract PowerTradeMatch is PowerMarket{
 
             for (uint256 j = 0; j < arrSellOrderId.length; j++) {
                 string memory sellOrderId = arrSellOrderId[j];
-                Order storage sellOrder = allSellOrderId[sellOrderId];
+                Order storage sellOrder = allSellOrderInfo[sellOrderId];
 
                 bool sellOrderFlag = checkLimitOrderStatus(sellOrder,OrderType.Sell);
                 if(!sellOrderFlag){
@@ -155,7 +155,7 @@ contract PowerTradeMatch is PowerMarket{
         for (uint256 j = 0; j < arrSellOrderId.length; j++) {
 
             string memory sellOrderId = arrSellOrderId[j];
-            Order storage sellOrder = allSellOrderId[sellOrderId];
+            Order storage sellOrder = allSellOrderInfo[sellOrderId];
             bool sellOrderFlag = checkMarketOrderStatus(sellOrder,OrderType.Sell);
             if(!sellOrderFlag){
                 continue;
@@ -179,7 +179,7 @@ contract PowerTradeMatch is PowerMarket{
             existsSellOrder = isStringNotEmpty(sellOrderId);
 
             if(existsSellOrder){
-                Order storage sellOrder = allSellOrderId[sellOrderId];
+                Order storage sellOrder = allSellOrderInfo[sellOrderId];
                 uint256 tradeQuantity = sellOrder.remainingQuantity;
                 if (tradeQuantity > buyOrder.remainingQuantity) {
                     tradeQuantity = buyOrder.remainingQuantity;
@@ -224,7 +224,7 @@ contract PowerTradeMatch is PowerMarket{
 
 
     function processMarketSellOrder(string memory sellOrderId) public {
-        Order storage sellOrder = allSellOrderId[sellOrderId];
+        Order storage sellOrder = allSellOrderInfo[sellOrderId];
 
         bool existsBuyOrder = false;
         do {
@@ -316,7 +316,7 @@ contract PowerTradeMatch is PowerMarket{
 
         for (uint i = 0; i < arrSellOrderId.length; i++) {
             string memory sellOrderId = arrSellOrderId[i];
-            Order storage sellOrder = allSellOrderId[sellOrderId];
+            Order storage sellOrder = allSellOrderInfo[sellOrderId];
 
 
             bool sellOrderFlag = checkMarkteSimpleStatus(sellOrder,OrderType.Sell);
