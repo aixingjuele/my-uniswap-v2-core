@@ -35,6 +35,9 @@ https://cloud.tencent.com/developer/article/2207615
 
         LimitType limitType;
 */
+
+eth  start
+
 #addSellOrderInfo
 [0,"SellOrder_001","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",6,6,10000,1764924773,"test售电主题信息5","test售电交付信息5",true,0,0]
 [0,"SellOrder_002","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",50,50,10088,1764924773,"test售电主题信息50","test售电交付信息50",true,0,0]
@@ -49,6 +52,26 @@ https://cloud.tencent.com/developer/article/2207615
 [0,"BuyOrder_003","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",500,500,10088,1764924773,"test购电主题信息500","test购电交付信息500",true,0,0]
 [0,"BuyOrder_004","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",5000,5000,10088,1764924773,"test购电主题信息5000","test购电交付信息5000",true,0,0]
 [0,"BuyOrder_005","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",1000000,1000000,10088,1764924773,"test购电主题信息1000000","test购电交付信息1000000",true,0,0]
+eth  end###############################
+
+
+fisco-bcos  start
+
+#addSellOrderInfo
+[0,"SellOrder_001","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",6,6,10000,1764924773000,"test售电主题信息5","test售电交付信息5",true,0,0]
+[0,"SellOrder_002","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",50,50,10088,1764924773000,"test售电主题信息50","test售电交付信息50",true,0,0]
+[0,"SellOrder_003","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",500,500,10088,1764924773000,"test售电主题信息500","test售电交付信息500",true,0,0]
+[0,"SellOrder_004","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",5000,5000,10088,1764924773000,"test售电主题信息5000","test售电交付信息5000",true,0,0]
+[0,"SellOrder_005","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",50000,50000,10088,1764924773000,"test售电主题信息50000","test售电交付信息50000",true,0,0]
+
+
+#buyOrderInfo
+[0,"BuyOrder_001","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",5,5,10088,1764924773000,"test购电主题信息5","test购电交付信息5",true,0,0]
+[0,"BuyOrder_002","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",50,50,10088,1764924773000,"test购电主题信息50","test购电交付信息50",true,0,0]
+[0,"BuyOrder_003","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",500,500,10088,1764924773000,"test购电主题信息500","test购电交付信息500",true,0,0]
+[0,"BuyOrder_004","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",5000,5000,10088,1764924773000,"test购电主题信息5000","test购电交付信息5000",true,0,0]
+[0,"BuyOrder_005","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",1000000,1000000,10088,1764924773000,"test购电主题信息1000000","test购电交付信息1000000",true,0,0]
+fisco-bcos  end###############################
 
 
 
