@@ -121,15 +121,36 @@ abstract contract PowerMarket is PowerModel{
 
 
     //###########sellOrderInfo start#######################################################
-    function addSellOrderInfo(Order memory o) public {
+    // [0,"SellOrder_001","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",5,5,10088,1701391904,"test售电主题信息5","test售电交付信息5",true,0,0]
+
+    function addSellOrderInfo(
+        string memory _orderId,
+        uint256 _quantity,
+        uint256 _price,
+        uint256 _expirationTime,
+        string memory _subjectInformation,
+        string memory _deliveryInformation,
+        LimitType _limitType
+    ) public {
+
+        Order memory o = Order({
+            timestamp: block.timestamp,
+            orderId: _orderId,
+            user: msg.sender,
+            quantity: _quantity,
+            remainingQuantity: _quantity,
+            price: _price,
+            expirationTime: _expirationTime,
+            subjectInformation: _subjectInformation,
+            deliveryInformation: _deliveryInformation,
+            initialized: true,
+            orderStatus: OrderStatus.Submitted,
+            limitType: _limitType
+        });
+
+
 
         checkOrderParameter(o);
-
-        o.initialized = true;
-        o.timestamp = block.timestamp;
-        o.user = msg.sender;
-        o.orderStatus = OrderStatus.Submitted;
-        o.remainingQuantity = o.quantity;
 
         sellOrderInfo[msg.sender][o.orderId]=o;
         allSellOrderInfo[o.orderId]=o;
